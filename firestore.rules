@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Reviews ---
+    match /reviews/{reviewId} {
+      function isValidReview(data) {
+        return data.keys().hasAll(['nicheId', 'nicheName', 'experienceSummary', 'actionableSteps', 'monetaryOutcome', 'rating', 'userId', 'userEmail', 'createdAt'])
+          && data.keys().size() == 9
+          && data.nicheId is string && data.nicheId.size() <= 128
+          && data.nicheName is string && data.nicheName.size() <= 200
+          && data.experienceSummary is string && data.experienceSummary.size() <= 5000
+          && data.actionableSteps is string && data.actionableSteps.size() <= 5000
+          && data.monetaryOutcome is string && data.monetaryOutcome.size() <= 1000
+          && data.rating is number && data.rating >= 1 && data.rating <= 5
+          && data.userId == request.auth.uid
+          && data.userEmail is string && data.userEmail.size() <= 200
+          && data.createdAt == request.time;
+      }
+
+      allow list, get: if true; // Reviews are public
+      
+      allow create: if isSignedIn() 
+        && isValidId(reviewId)
+        && isValidReview(request.resource.data);
+        
+      allow update: if isOwner(resource.data.userId)
+        && isValidReview(request.resource.data)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.nicheId == resource.data.nicheId;
+        
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // --- Daily Niches ---
+    match /daily_niches/{nicheId} {
+      function isValidDailyNiche(data) {
+        return data.keys().hasAll(['title', 'category', 'difficulty', 'shortDescription', 'potential', 'startupCost', 'timeCommitment', 'marketSaturation', 'skillRequired', 'publishDate'])
+          && data.keys().size() == 10
+          && data.title is string && data.title.size() <= 200
+          && data.category is string && data.category.size() <= 50
+          && data.difficulty is string && data.difficulty.size() <= 50
+          && data.shortDescription is string && data.shortDescription.size() <= 1000
+          && data.potential is string && data.potential.size() <= 10
+          && data.startupCost is number
+          && data.timeCommitment is number
+          && data.marketSaturation is number
+          && data.skillRequired is number
+          && data.publishDate is string && data.publishDate.size() <= 20;
+      }
+
+      allow list, get: if true;
+      allow create: if isSignedIn() && isValidDailyNiche(request.resource.data);
+    }
+  }
+}

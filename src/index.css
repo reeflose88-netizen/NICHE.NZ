@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Playfair Display", serif;
+  
+  --color-surface: #FFFFFF;
+  --color-header: #F8F9FA;
+  --color-ink: #1A1A1B;
+  --color-accent-bg: #E9ECEF;
+  --color-active: #0056B3; /* Corporate Blue */
+  --color-pop-cyan: #002B5B; /* Navy */
+  --color-pop-pink: #D90429;  /* Alert Red */
+  --color-pop-yellow: #6C757D; /* Steel Gray */
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-surface)] text-[var(--color-ink)] font-sans leading-none antialiased;
+    background-image: linear-gradient(rgba(26, 26, 27, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 26, 27, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-attachment: fixed;
+  }
+}
+
+.brutalist-card {
+  @apply bg-white border-2 border-ink shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all;
+}
+
+.brutalist-card:hover {
+  @apply translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)];
+}
+
+.pop-shadow-red {
+  box-shadow: 4px 4px 0px 0px var(--color-active);
+}
+
+.pop-shadow-blue {
+  box-shadow: 4px 4px 0px 0px var(--color-pop-cyan);
+}
+
+.pop-gradient {
+  background: linear-gradient(45deg, #F8F9FA 25%, #E9ECEF 25%, #E9ECEF 50%, #F8F9FA 50%, #F8F9FA 75%, #E9ECEF 75%, #E9ECEF 100%);
+  background-size: 20px 20px;
+}
+
+.markdown-body {
+  @apply font-mono text-[11px] leading-relaxed;
+}
+
+.markdown-body p {
+  @apply mb-4 opacity-80;
+}
+
+.markdown-body strong {
+  @apply font-black text-ink;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(20, 20, 20, 0.05);
+  border-left: 1px solid rgba(20, 20, 20, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+  border-left: 2px solid var(--color-accent-bg);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-active);
+}

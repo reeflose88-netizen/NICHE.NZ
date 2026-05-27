@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Review": {
+      "title": "Review",
+      "description": "User submitted success story or review for a niche",
+      "type": "object",
+      "properties": {
+        "nicheId": { "type": "string" },
+        "nicheName": { "type": "string" },
+        "experienceSummary": { "type": "string" },
+        "actionableSteps": { "type": "string" },
+        "monetaryOutcome": { "type": "string" },
+        "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nicheId", "nicheName", "experienceSummary", "actionableSteps", "monetaryOutcome", "rating", "userId", "createdAt"]
+    },
+    "DailyNiche": {
+      "title": "Daily Niche",
+      "description": "An AI generated niche for the day",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "potential": { "type": "string" },
+        "startupCost": { "type": "number" },
+        "timeCommitment": { "type": "number" },
+        "marketSaturation": { "type": "number" },
+        "skillRequired": { "type": "number" },
+        "publishDate": { "type": "string", "format": "date" }
+      },
+      "required": ["title", "category", "difficulty", "shortDescription", "potential", "startupCost", "timeCommitment", "marketSaturation", "skillRequired", "publishDate"]
+    }
+  },
+  "firestore": {
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of all user reviews and success stories"
+    },
+    "/daily_niches/{nicheId}": {
+      "schema": "DailyNiche",
+      "description": "Archive of daily generated niches"
+    }
+  }
+}
