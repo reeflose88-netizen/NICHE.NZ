@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Zap, Sparkles, X, ChevronRight, Loader2, ArrowUpRight, Star, Heart, 
-  TrendingUp, Clock, Wallet, Brain, MessageSquare, Plus, CheckCircle2, Cpu, Target, BookOpen, Users
+  TrendingUp, Clock, Wallet, Brain, MessageSquare, Plus, CheckCircle2, Cpu, Target, BookOpen, Users,
+  ArrowLeft
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -101,6 +102,7 @@ export default function App() {
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'details'>('list');
 
   // Agent State
   const [isAgentOpen, setIsAgentOpen] = useState(false);
@@ -265,13 +267,16 @@ export default function App() {
 
   const [activeNicheId, setActiveNicheId] = useState<string | null>(null);
 
-  const handleNicheClick = async (niche: Niche) => {
+  const handleNicheClick = async (niche: Niche, setMobile = true) => {
     setSelectedNiche(niche);
     setActiveNicheId(niche.id);
     setIsLoadingPlan(true);
     setIsGeneratingImage(true);
     setActionPlan(null);
     setAiImage(null);
+    if (setMobile) {
+      setMobileView('details');
+    }
     
     // Store current ID to prevent race conditions
     const currentId = niche.id;
@@ -383,7 +388,7 @@ export default function App() {
   // Load initial plan for the first niche
   useEffect(() => {
     if (selectedNiche && !actionPlan) {
-      handleNicheClick(selectedNiche);
+      handleNicheClick(selectedNiche, false);
     }
   }, []);
 
@@ -641,9 +646,12 @@ export default function App() {
         )}
       </motion.div>
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex overflow-hidden min-h-0">
         {/* List Section */}
-        <section className="w-full lg:w-2/3 border-r-4 border-ink flex flex-col overflow-hidden bg-white">
+        <section className={cn(
+          "w-full lg:w-2/3 border-r-4 border-ink flex flex-col overflow-hidden bg-white min-h-0",
+          mobileView === 'details' ? "hidden lg:flex" : "flex"
+        )}>
           {/* List Header */}
           <div className="grid grid-cols-12 bg-white text-ink text-[10px] font-black uppercase py-4 px-6 gap-4 italic tracking-widest border-b-4 border-ink">
             <div className="col-span-1">ID</div>
@@ -727,15 +735,26 @@ export default function App() {
         </section>
 
         {/* Sidebar Info */}
-        <aside className="hidden lg:flex w-1/3 bg-header p-8 flex-col gap-8 overflow-y-auto custom-scrollbar border-l-4 border-ink relative z-0">
+        <aside className={cn(
+          "w-full lg:w-1/3 bg-header p-4 md:p-10 flex flex-col gap-6 md:gap-8 overflow-y-auto custom-scrollbar border-l-4 border-ink relative z-0 min-h-0",
+          mobileView === 'list' ? "hidden lg:flex" : "flex"
+        )}>
           <AnimatePresence mode="wait">
             <motion.div 
               key={selectedNiche?.id || 'empty'}
               initial={{ x: 30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -30, opacity: 0 }}
-              className="flex flex-col gap-8"
+              className="flex flex-col gap-6 md:gap-8"
             >
+              {/* Mobile Back Navigation */}
+              <button 
+                onClick={() => setMobileView('list')} 
+                className="lg:hidden flex items-center gap-2 bg-white text-ink px-4 py-2 text-[10px] uppercase font-black tracking-widest border-2 border-ink shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none self-start"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back_To_Directory
+              </button>
               <div className="flex flex-col gap-3">
                 <div className="relative group overflow-hidden border-4 border-ink shadow-[12px_12px_0px_0px_#000000] mb-6 bg-white aspect-video flex items-center justify-center">
                   {isGeneratingImage ? (
@@ -1020,7 +1039,7 @@ export default function App() {
           >
             <motion.div 
               initial={{ scale: 0.9, rotate: -1 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0.9, rotate: 1 }}
-              className="bg-white border-8 border-ink w-full max-w-lg p-10 flex flex-col gap-8 shadow-[24px_24px_0px_0px_rgba(0,0,0,1)] relative"
+              className="bg-white border-8 border-ink w-full max-w-lg p-6 md:p-10 flex flex-col gap-6 md:gap-8 shadow-[24px_24px_0px_0px_rgba(0,0,0,1)] relative max-h-[92vh] md:max-h-[85vh] overflow-y-auto custom-scrollbar"
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-start border-b-6 border-ink pb-6">
@@ -1099,7 +1118,7 @@ export default function App() {
           >
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white border-8 border-ink w-full max-w-2xl p-12 flex flex-col gap-8 shadow-[24px_24px_0px_0px_var(--color-active)]"
+              className="bg-white border-8 border-ink w-full max-w-2xl p-6 md:p-12 flex flex-col gap-6 md:gap-8 shadow-[20px_20px_0px_0px_var(--color-active)] max-h-[92vh] md:max-h-[85vh] overflow-y-auto custom-scrollbar"
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-start border-b-6 border-ink pb-6">
