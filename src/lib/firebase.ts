@@ -4,8 +4,22 @@ import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-// CRITICAL: The app will break without providing the database ID
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId); 
+
+// Get Firestore instance - safely handle optional firestoreDatabaseId
+const dbInstance = (() => {
+  try {
+    // If firestoreDatabaseId is present in config, use it; otherwise use default
+    if (firebaseConfig.firestoreDatabaseId) {
+      return getFirestore(app, firebaseConfig.firestoreDatabaseId);
+    }
+    return getFirestore(app);
+  } catch (error) {
+    console.warn("[Firebase] Using default Firestore instance:", error);
+    return getFirestore(app);
+  }
+})();
+
+export const db = dbInstance;
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
@@ -15,9 +29,10 @@ async function testConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {
-    if(error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn("[Firebase] Client is offline. Check your network connection.");
     }
+    // Silently ignore other errors (test doc may not exist)
   }
 }
 testConnection();
