@@ -4,7 +4,7 @@ import { Niche } from "../data/niches";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function getNicheActionPlan(nicheTitle: string, description: string) {
-  const model = "gemini-3-flash-preview";
+  const model = "gemini-2.0-flash";
   const prompt = `
     Produce a high-performance business blueprint for the following NZ niche:
     
@@ -42,7 +42,7 @@ export async function getNicheActionPlan(nicheTitle: string, description: string
 }
 
 export async function generateCustomNiche(userPrompt: string): Promise<Partial<Niche>> {
-  const model = "gemini-3-flash-preview";
+  const model = "gemini-2.0-flash";
   const prompt = `
     Generate a unique, high-potential, and specifically LOW-COST (ideally $0 startup) money-making niche for the New Zealand market based on this request: "${userPrompt}".
     
@@ -71,7 +71,6 @@ export async function generateCustomNiche(userPrompt: string): Promise<Partial<N
   } catch (error: any) {
     const isQuotaError = error?.status === 429 || error?.message?.includes('429');
     if (isQuotaError) {
-      // Return a "recovering" state or throw specific error
       throw new Error("SYNTHESIS_RECHARGING: The agent has exhausted its neural tokens. Try again in 60 seconds.");
     }
     console.error("Custom Niche Generation Error:", error);
@@ -80,7 +79,7 @@ export async function generateCustomNiche(userPrompt: string): Promise<Partial<N
 }
 
 export async function generateDailyNicheDiscovery(): Promise<Partial<Niche>> {
-  const model = "gemini-3-flash-preview";
+  const model = "gemini-2.0-flash";
   const prompt = `
     Generate a completely new, high-potential "Daily Alpha" business niche for the New Zealand market.
     It should be an emerging opportunity (e.g. involving new tech like AI, or a specific local need).
@@ -111,8 +110,6 @@ export async function generateDailyNicheDiscovery(): Promise<Partial<Niche>> {
     const isQuotaError = error?.status === 429 || error?.message?.includes('429');
     if (isQuotaError) {
       console.warn("Daily Niche Quota Hit. Using static archive fallback.");
-      // Return a random high-quality niche from the database as a "daily" discovery fallback 
-      // This matches the data structure of Niche
       return {
         title: "Micro-SaaS for NZ Tradies",
         category: "Tech",
@@ -133,7 +130,7 @@ export async function generateDailyNicheDiscovery(): Promise<Partial<Niche>> {
 export async function generateNicheImage(nicheTitle: string) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image",
+      model: "gemini-2.0-flash-exp-image-generation",
       contents: {
         parts: [
           {
@@ -144,9 +141,7 @@ export async function generateNicheImage(nicheTitle: string) {
         ],
       },
       config: {
-        imageConfig: {
-          aspectRatio: "16:9",
-        },
+        responseModalities: ["IMAGE"],
       },
     });
 
@@ -161,7 +156,6 @@ export async function generateNicheImage(nicheTitle: string) {
     
     if (isQuotaError) {
       console.warn("Gemini Image Quota Exceeded. Using high-quality source fallback.");
-      // Return a high-quality architectural fallback image
       return "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop";
     }
 
