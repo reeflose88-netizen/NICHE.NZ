@@ -247,7 +247,7 @@ export default function App() {
 
       return matchesSearch && matchesCategory && matchesPotential && matchesCost && matchesTime;
     });
-  }, [search, category, potentialFilter, costFilter, timeFilter, customNiches]);
+  }, [search, category, potentialFilter, costFilter, timeFilter, customNiches, dailyNiches]);
 
   const categories = ['All', 'Digital', 'Service', 'Local', 'Creative', 'Tech'];
 
@@ -1017,7 +1017,7 @@ export default function App() {
       {/* Global Footer */}
       <footer className="h-8 hidden lg:flex items-center px-4 bg-ink text-surface font-mono text-[9px] uppercase justify-between tracking-[0.2em] border-t border-surface/10">
         <div className="flex gap-8">
-          <span>© 2026 NicheSource.NZ // VER_4.0_STABLE</span>
+          <span>&copy; 2026 NicheSource.NZ // VER_4.0_STABLE</span>
           <span className="opacity-40">Network Status: ONLINE</span>
         </div>
         <div className="flex gap-4 items-center">
@@ -1563,7 +1563,7 @@ export default function App() {
                   <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none border-b-6 border-ink pb-2">The Alpha Score</h2>
                   <div className="bg-ink text-white p-6 border-4 border-pop-yellow shadow-[8px_8px_0px_0px_var(--color-pop-yellow)]">
                      <p className="text-xs font-black uppercase italic opacity-70 mb-4">Calculation Formula:</p>
-                     <p className="text-lg font-black italic text-pop-yellow leading-tight tracking-tighter">(0.4 × Cost) + (0.3 × Skill) + (0.2 × Commitment) + (0.1 × Saturation)</p>
+                     <p className="text-lg font-black italic text-pop-yellow leading-tight tracking-tighter">(0.4 x Cost) + (0.3 x Skill) + (0.2 x Commitment) + (0.1 x Saturation)</p>
                   </div>
                   <p className="text-sm font-black uppercase leading-relaxed opacity-70 mt-4 italic text-ink">
                     Focus on scores under 4.0 for rapid starts.

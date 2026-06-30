@@ -15,9 +15,12 @@ export const LinkPreview: React.FC<{ url: string }> = ({ url }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchPreview = async () => {
+      if (controller.signal.aborted) return;
       try {
-        const res = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
+        const res = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`, { signal: controller.signal });
         const json = await res.json();
         setData(json);
       } catch (err) {
@@ -32,6 +35,8 @@ export const LinkPreview: React.FC<{ url: string }> = ({ url }) => {
     } else {
       setLoading(false);
     }
+
+    return () => controller.abort();
   }, [url]);
 
   if (loading) {
@@ -58,7 +63,6 @@ export const LinkPreview: React.FC<{ url: string }> = ({ url }) => {
     );
   }
 
-  // If status is 403 or ENOTFOUND (which we handle as 500 on server with a partial payload), we still have a title (hostname)
   const isRestricted = data.status === 403 || (data as any).isRestricted;
 
   return (
